@@ -11,12 +11,10 @@ export function Stitch({ width, height, colour, changeColour }: Props) {
       style={{
         width,
         height,
-        borderTop: "2px solid",
-        borderRight: "2px solid",
+        borderTop: "1px solid",
+        borderRight: "1px solid",
         backgroundColor: colour ?? "transparent",
         cursor: "pointer",
-        flexGrow: 0,
-        flexShrink: 0,
       }}
       onClick={changeColour}
     />

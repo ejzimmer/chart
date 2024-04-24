@@ -32,6 +32,8 @@ export function Controls() {
     updateGauge,
     setColour,
     colour: currentColour,
+    inLineMode,
+    switchLineMode,
   } = useContext(LayoutContext)
   const [stitchGauge, setStitchGauge] = useState<number | undefined>(
     gauge?.stitchGauge
@@ -103,6 +105,10 @@ export function Controls() {
           removeColour={() => removeColour(colour)}
         />
       ))}
+      <label>
+        draw line{" "}
+        <input type="checkbox" checked={inLineMode} onChange={switchLineMode} />
+      </label>
       <button onClick={onSubmit}>submit</button>
     </form>
   )

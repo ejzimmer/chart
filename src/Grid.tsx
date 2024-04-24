@@ -1,6 +1,15 @@
-import { useCallback, useContext, useEffect, useState } from "react"
+import {
+  RefObject,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react"
 import { LayoutContext } from "./LayoutContext"
 import { Stitch } from "./Stitch"
+import { Corner } from "./Corner"
+import { Line } from "./Line"
 
 type StitchGrid = (string | undefined)[][]
 
@@ -28,8 +37,10 @@ const initialisePattern = (rows: number, columns: number) => {
 }
 
 export function Grid() {
-  const { layout, colour } = useContext(LayoutContext)
+  const { layout, colour, inLineMode, addVertex, lines } =
+    useContext(LayoutContext)
   const [stitches, setStitches] = useState<StitchGrid>([])
+  const gridRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     layout &&
@@ -56,21 +67,51 @@ export function Grid() {
 
   if (!layout) return null
 
+  const coordinates = getAbsoluteCoordinates(lines, gridRef)
+
   return (
-    <div>
+    <div ref={gridRef}>
+      {coordinates.map((line, index) => (
+        <Line key={index} vertices={line} />
+      ))}
+
       {stitches.map((row, rowIndex) => (
-        <div key={rowIndex} style={{ display: "flex" }}>
+        <div key={rowIndex} style={{ display: "flex" }} className="row">
           {row.map((stitch, columnIndex) => (
-            <Stitch
+            <div
+              style={{ flexGrow: 0, flexShrink: 0, position: "relative" }}
+              className="column"
               key={`${rowIndex}${columnIndex}`}
-              width={layout.stitchWidth}
-              height={layout.rowHeight}
-              colour={stitch}
-              changeColour={() => drawStitch(rowIndex, columnIndex)}
-            />
+            >
+              <Stitch
+                width={layout.stitchWidth}
+                height={layout.rowHeight}
+                colour={stitch}
+                changeColour={() => drawStitch(rowIndex, columnIndex)}
+              />
+              {inLineMode && (
+                <Corner onClick={() => addVertex(rowIndex, columnIndex)} />
+              )}
+            </div>
           ))}
         </div>
       ))}
     </div>
+  )
+}
+
+function getAbsoluteCoordinates(
+  lines: [number, number][][],
+  gridRef: RefObject<HTMLElement>
+): [number, number][][] {
+  return lines.map((line) =>
+    line.map(([row, column]) => {
+      const rowElement = gridRef.current?.querySelectorAll(".row")[row]
+      const cell = rowElement?.querySelectorAll(".column")[column]
+      if (!cell) return [-1, -1]
+
+      const { top, left } = cell.getBoundingClientRect()
+      return [left, top]
+    })
   )
 }
