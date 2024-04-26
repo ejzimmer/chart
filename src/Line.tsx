@@ -1,14 +1,17 @@
-import { Fragment } from "react/jsx-runtime"
+import { Fragment } from "react"
+
+export type Path = [number, number][]
 
 type Props = {
-  vertices: [number, number][]
+  lines: Path[]
 }
 
 const RADIUS = 4
 
-export function Line({ vertices }: Props) {
+export function Lines({ lines }: Props) {
   const width = window.innerWidth
   const height = window.innerHeight
+
   return (
     <svg
       viewBox={`0 0 ${width} ${height}`}
@@ -21,6 +24,16 @@ export function Line({ vertices }: Props) {
         zIndex: -1,
       }}
     >
+      {lines.map((vertices, index) => (
+        <Line key={index} vertices={vertices} />
+      ))}
+    </svg>
+  )
+}
+
+function Line({ vertices }: { vertices: Path }) {
+  return (
+    <>
       {vertices.map(([x, y], index) => {
         const previousPoint = vertices[index - 1]
         return (
@@ -36,6 +49,6 @@ export function Line({ vertices }: Props) {
           </Fragment>
         )
       })}
-    </svg>
+    </>
   )
 }

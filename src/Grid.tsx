@@ -9,7 +9,7 @@ import {
 import { LayoutContext } from "./LayoutContext"
 import { Stitch } from "./Stitch"
 import { Corner } from "./Corner"
-import { Line } from "./Line"
+import { Lines, Path } from "./Line"
 
 type StitchGrid = (string | undefined)[][]
 
@@ -40,12 +40,16 @@ export function Grid() {
   const { layout, colour, inLineMode, addVertex, lines } =
     useContext(LayoutContext)
   const [stitches, setStitches] = useState<StitchGrid>([])
+  const [coordinates, setCoordinates] = useState<Path[]>()
   const gridRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     layout &&
       setStitches(initialisePattern(layout?.numberOfRows, layout.stsPerRow))
   }, [layout])
+  useEffect(() => {
+    stitches && setCoordinates(getAbsoluteCoordinates(lines, gridRef))
+  }, [stitches, lines])
 
   const drawStitch = useCallback(
     (row: number, column: number) => {
@@ -67,13 +71,9 @@ export function Grid() {
 
   if (!layout) return null
 
-  const coordinates = getAbsoluteCoordinates(lines, gridRef)
-
   return (
     <div ref={gridRef}>
-      {coordinates.map((line, index) => (
-        <Line key={index} vertices={line} />
-      ))}
+      {coordinates && <Lines lines={coordinates} />}
 
       {stitches.map((row, rowIndex) => (
         <div key={rowIndex} style={{ display: "flex" }} className="row">
@@ -101,7 +101,7 @@ export function Grid() {
 }
 
 function getAbsoluteCoordinates(
-  lines: [number, number][][],
+  lines: Path[],
   gridRef: RefObject<HTMLElement>
 ): [number, number][][] {
   return lines.map((line) =>
