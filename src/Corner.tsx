@@ -28,8 +28,3 @@ export function Corner({ onClick }: Props) {
     />
   )
 }
-
-// click on corner
-// add corner to line, mark corner as part of line
-// if there's more than one corner, draw a line between them
-// if this corner is the last one in the line, remover the corner

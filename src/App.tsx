@@ -1,7 +1,9 @@
 import { Controls } from "./Controls"
 import { Grid } from "./Grid"
 import { Layout } from "./LayoutContext"
-// draw lines
+
+// delete points off lines
+// delete whole lines
 // clear pattern
 // clear stitch
 // make pretty, a11y, error handling

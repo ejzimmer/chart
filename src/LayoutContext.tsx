@@ -34,7 +34,17 @@ type ContextType = Partial<StoredData> & {
 }
 
 const SAVED_DATA_KEY = "charts_data"
+const LINES_KEY = "charts_lines"
 const CM_TO_PX = 37.8
+
+const persistLines = (lines: [number, number][][]) => {
+  console.log("persistingLines", lines)
+  localStorage.setItem(LINES_KEY, JSON.stringify(lines))
+}
+const initialiseLines = () => {
+  const persistedLines = localStorage.getItem(LINES_KEY)
+  return persistedLines ? JSON.parse(persistedLines) : []
+}
 
 export const LayoutContext = createContext<ContextType>({
   gauge: undefined,
@@ -53,7 +63,16 @@ export function Layout({ children }: PropsWithChildren<unknown>) {
   const [layout, setLayout] = useState<LayoutType>()
   const [colour, setColour] = useState<string>()
   const [inLineMode, setInLineMode] = useState(false)
-  const [lines, setLines] = useState<Array<[number, number]>[]>([])
+  const [lines, setLines] = useState<Array<[number, number]>[]>(initialiseLines)
+
+  const startDrawing = useCallback(() => {
+    setInLineMode(true)
+    setLines([...lines, []])
+  }, [lines])
+  const stopDrawing = useCallback(() => {
+    setInLineMode(false)
+    persistLines(lines)
+  }, [lines])
 
   useEffect(() => {
     const data = localStorage.getItem(SAVED_DATA_KEY)
@@ -102,20 +121,25 @@ export function Layout({ children }: PropsWithChildren<unknown>) {
 
   const switchLineMode = useCallback(() => {
     if (inLineMode) {
-      setInLineMode(false)
+      stopDrawing()
     } else {
-      setInLineMode(true)
-      setLines([...lines, []])
+      startDrawing()
     }
-  }, [inLineMode, lines])
+  }, [inLineMode, startDrawing, stopDrawing])
   const addVertex = useCallback(
     (x: number, y: number) => {
       const finishedLines = lines.slice(0, -1) ?? []
       const currentLine = lines.at(-1) ?? []
-      currentLine?.push([x, y])
-      setLines([...finishedLines, currentLine])
+
+      const lastPoint = currentLine?.at(-1)
+      if (lastPoint?.[0] === x && lastPoint?.[1] === y) {
+        stopDrawing()
+      } else {
+        currentLine?.push([x, y])
+        setLines([...finishedLines, currentLine])
+      }
     },
-    [lines]
+    [lines, stopDrawing]
   )
 
   return (
