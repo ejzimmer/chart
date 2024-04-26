@@ -126,11 +126,13 @@ export function Layout({ children }: PropsWithChildren<unknown>) {
 
   const drawStitch = useCallback(
     (row: number, column: number) => {
+      const currentStitchColour = pattern[row][column]
+      const newStitchColour = currentStitchColour ? undefined : colour
       const newPattern = [
         ...pattern.slice(0, row),
         [
           ...pattern[row].slice(0, column),
-          colour,
+          newStitchColour,
           ...pattern[row].slice(column + 1),
         ],
         ...pattern.slice(row + 1),
@@ -142,7 +144,7 @@ export function Layout({ children }: PropsWithChildren<unknown>) {
     [pattern, colour]
   )
   const clearChart = useCallback(() => {
-    const clearedPattern = pattern.map((row) => row.map(() => "transparent"))
+    const clearedPattern = pattern.map((row) => row.map(() => undefined))
     setPattern(clearedPattern)
     persistPattern(clearedPattern)
     setLines([])

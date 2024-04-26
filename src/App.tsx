@@ -2,7 +2,6 @@ import { Controls } from "./Controls"
 import { Grid } from "./Grid"
 import { Layout } from "./LayoutContext"
 
-// clear pattern
 // clear stitch
 // make pretty, a11y, error handling
 // publish
