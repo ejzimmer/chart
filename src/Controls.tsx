@@ -34,6 +34,7 @@ export function Controls() {
     colour: currentColour,
     inLineMode,
     switchLineMode,
+    clearChart,
   } = useContext(LayoutContext)
   const [stitchGauge, setStitchGauge] = useState<number | undefined>(
     gauge?.stitchGauge
@@ -109,6 +110,7 @@ export function Controls() {
         draw line{" "}
         <input type="checkbox" checked={inLineMode} onChange={switchLineMode} />
       </label>
+      <button onClick={clearChart}>clear chart</button>
       <button onClick={onSubmit}>submit</button>
     </form>
   )

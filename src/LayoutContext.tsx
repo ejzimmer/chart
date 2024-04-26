@@ -5,6 +5,7 @@ import {
   useEffect,
   useState,
 } from "react"
+import { StitchGrid } from "./Grid"
 
 type Gauge = {
   stitchGauge: number
@@ -31,14 +32,38 @@ type ContextType = Partial<StoredData> & {
   switchLineMode: () => void
   addVertex: (x: number, y: number) => void
   lines: [number, number][][]
+  drawStitch: (x: number, y: number) => void
+  pattern: StitchGrid
+  clearChart: () => void
 }
 
 const SAVED_DATA_KEY = "charts_data"
 const LINES_KEY = "charts_lines"
+const PATTERN_KEY = "pattern"
 const CM_TO_PX = 37.8
 
+const persistPattern = (pattern: StitchGrid) => {
+  localStorage.setItem(PATTERN_KEY, JSON.stringify(pattern))
+}
+const initialisePattern = (rows: number, columns: number) => {
+  const grid: StitchGrid = Array.from({ length: rows }).map(() =>
+    Array.from({ length: columns })
+  )
+  const persistedPattern = localStorage.getItem(PATTERN_KEY)
+  if (!persistedPattern) return grid
+
+  JSON.parse(persistedPattern).forEach((row: string[], rowNumber: number) => {
+    row.forEach((cell, column) => {
+      if (cell) {
+        grid[rowNumber][column] = cell
+      }
+    })
+  })
+
+  return grid
+}
+
 const persistLines = (lines: [number, number][][]) => {
-  console.log("persistingLines", lines)
   localStorage.setItem(LINES_KEY, JSON.stringify(lines))
 }
 const initialiseLines = () => {
@@ -56,12 +81,16 @@ export const LayoutContext = createContext<ContextType>({
   switchLineMode: () => undefined,
   addVertex: () => undefined,
   lines: [],
+  clearChart: () => undefined,
+  pattern: [],
+  drawStitch: () => undefined,
 })
 
 export function Layout({ children }: PropsWithChildren<unknown>) {
   const [gauge, setGauge] = useState<Gauge>()
   const [layout, setLayout] = useState<LayoutType>()
   const [colour, setColour] = useState<string>()
+  const [pattern, setPattern] = useState<StitchGrid>([])
   const [inLineMode, setInLineMode] = useState(false)
   const [lines, setLines] = useState<Array<[number, number]>[]>(initialiseLines)
 
@@ -79,17 +108,46 @@ export function Layout({ children }: PropsWithChildren<unknown>) {
     if (!data) return
 
     const { stitchGauge, rowGauge, colour } = JSON.parse(data)
-    if (stitchGauge && rowGauge) {
-      setGauge({
-        stitchGauge: Number.parseFloat(stitchGauge),
-        rowGauge: Number.parseFloat(rowGauge),
-      })
-      setLayout({ ...getLayout({ stitchGauge, rowGauge }) })
+    if (!stitchGauge || !rowGauge) {
+      return
     }
+
+    setGauge({
+      stitchGauge: Number.parseFloat(stitchGauge),
+      rowGauge: Number.parseFloat(rowGauge),
+    })
+    const layout = getLayout({ stitchGauge, rowGauge })
+    setLayout(layout)
     if (colour) {
       setColour(colour)
     }
+    setPattern(initialisePattern(layout.numberOfRows, layout.stsPerRow))
   }, [])
+
+  const drawStitch = useCallback(
+    (row: number, column: number) => {
+      const newPattern = [
+        ...pattern.slice(0, row),
+        [
+          ...pattern[row].slice(0, column),
+          colour,
+          ...pattern[row].slice(column + 1),
+        ],
+        ...pattern.slice(row + 1),
+      ]
+
+      setPattern(newPattern)
+      persistPattern(newPattern)
+    },
+    [pattern, colour]
+  )
+  const clearChart = useCallback(() => {
+    const clearedPattern = pattern.map((row) => row.map(() => "transparent"))
+    setPattern(clearedPattern)
+    persistPattern(clearedPattern)
+    setLines([])
+    persistLines([])
+  }, [pattern])
 
   const updateStorage = useCallback(
     (data: Partial<StoredData>) => {
@@ -150,10 +208,13 @@ export function Layout({ children }: PropsWithChildren<unknown>) {
         updateGauge,
         colour,
         setColour: updateColour,
+        pattern,
+        drawStitch,
         inLineMode,
         switchLineMode,
         addVertex,
         lines,
+        clearChart,
       }}
     >
       {children}

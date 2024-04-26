@@ -1,73 +1,20 @@
-import {
-  RefObject,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react"
+import { RefObject, useContext, useEffect, useRef, useState } from "react"
 import { LayoutContext } from "./LayoutContext"
 import { Stitch } from "./Stitch"
 import { Corner } from "./Corner"
 import { Lines, Path } from "./Line"
 
-type StitchGrid = (string | undefined)[][]
-
-const PATTERN_KEY = "pattern"
-
-const persistPattern = (pattern: StitchGrid) => {
-  localStorage.setItem(PATTERN_KEY, JSON.stringify(pattern))
-}
-const initialisePattern = (rows: number, columns: number) => {
-  const grid: StitchGrid = Array.from({ length: rows }).map(() =>
-    Array.from({ length: columns })
-  )
-  const persistedPattern = localStorage.getItem(PATTERN_KEY)
-  if (!persistedPattern) return grid
-
-  JSON.parse(persistedPattern).forEach((row: string[], rowNumber: number) => {
-    row.forEach((cell, column) => {
-      if (cell) {
-        grid[rowNumber][column] = cell
-      }
-    })
-  })
-
-  return grid
-}
+export type StitchGrid = (string | undefined)[][]
 
 export function Grid() {
-  const { layout, colour, inLineMode, addVertex, lines } =
+  const { layout, inLineMode, drawStitch, pattern, addVertex, lines } =
     useContext(LayoutContext)
-  const [stitches, setStitches] = useState<StitchGrid>([])
   const [coordinates, setCoordinates] = useState<Path[]>()
   const gridRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    layout &&
-      setStitches(initialisePattern(layout?.numberOfRows, layout.stsPerRow))
-  }, [layout])
-  useEffect(() => {
-    stitches && setCoordinates(getAbsoluteCoordinates(lines, gridRef))
-  }, [stitches, lines])
-
-  const drawStitch = useCallback(
-    (row: number, column: number) => {
-      const newStitches = [
-        ...stitches.slice(0, row),
-        [
-          ...stitches[row].slice(0, column),
-          colour,
-          ...stitches[row].slice(column + 1),
-        ],
-        ...stitches.slice(row + 1),
-      ]
-
-      setStitches(newStitches)
-      persistPattern(newStitches)
-    },
-    [stitches, colour]
-  )
+    pattern && setCoordinates(getAbsoluteCoordinates(lines, gridRef))
+  }, [pattern, lines])
 
   if (!layout) return null
 
@@ -75,7 +22,7 @@ export function Grid() {
     <div ref={gridRef}>
       {coordinates && <Lines lines={coordinates} />}
 
-      {stitches.map((row, rowIndex) => (
+      {pattern.map((row, rowIndex) => (
         <div key={rowIndex} style={{ display: "flex" }} className="row">
           {row.map((stitch, columnIndex) => (
             <div
