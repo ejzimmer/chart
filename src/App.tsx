@@ -1,6 +1,6 @@
-import { Controls } from "./Controls"
-import { Grid } from "./Grid"
-import { Layout } from "./LayoutContext"
+import { Controls } from "./controls/Controls"
+import { Grid } from "./grid/Grid"
+import { Provider } from "./Context"
 
 // delete lines
 // make pretty, a11y, error handling
@@ -10,10 +10,10 @@ import { Layout } from "./LayoutContext"
 
 function App() {
   return (
-    <Layout>
+    <Provider>
       <Controls />
       <Grid />
-    </Layout>
+    </Provider>
   )
 }
 
