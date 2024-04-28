@@ -191,8 +191,12 @@ export function Layout({ children }: PropsWithChildren<unknown>) {
       const finishedLines = lines.slice(0, -1) ?? []
       const currentLine = lines.at(-1) ?? []
 
+      const secondLastPoint = currentLine?.at(-2)
       const lastPoint = currentLine?.at(-1)
-      if (lastPoint?.[0] === x && lastPoint?.[1] === y) {
+      if (secondLastPoint?.[0] === x && secondLastPoint?.[1] === y) {
+        const updatedLine = currentLine.slice(0, -1)
+        setLines([...finishedLines, updatedLine])
+      } else if (lastPoint?.[0] === x && lastPoint?.[1] === y) {
         stopDrawing()
       } else {
         currentLine?.push([x, y])

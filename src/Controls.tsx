@@ -107,7 +107,7 @@ export function Controls() {
         />
       ))}
       <label>
-        draw line{" "}
+        draw line
         <input type="checkbox" checked={inLineMode} onChange={switchLineMode} />
       </label>
       <button onClick={clearChart}>clear chart</button>

@@ -34,7 +34,9 @@ export function Grid() {
                 width={layout.stitchWidth}
                 height={layout.rowHeight}
                 colour={stitch}
-                changeColour={() => drawStitch(rowIndex, columnIndex)}
+                changeColour={() =>
+                  inLineMode ? undefined : drawStitch(rowIndex, columnIndex)
+                }
               />
               {inLineMode && (
                 <Corner onClick={() => addVertex(rowIndex, columnIndex)} />
