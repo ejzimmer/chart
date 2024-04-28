@@ -2,6 +2,10 @@ import { ChangeEvent, useCallback, useState } from "react"
 import { Colour } from "./Colour"
 import { getColours, persistColours } from "../storage-utils"
 import { useData, useUpdaters } from "../Context"
+import { LineControl } from "./LineControl"
+import { ClearChart } from "./ClearChart"
+import { GaugeInput } from "./GaugeInput"
+import { ColourPicker } from "./ColourPicker"
 
 const initialiseColours = () => {
   const colours = getColours()
@@ -51,25 +55,24 @@ export function Controls() {
         left: 0,
         width: "100%",
         background: "white",
+        display: "flex",
+        alignItems: "center",
+        gap: "8px",
+        margin: "0",
+        boxSizing: "border-box",
       }}
     >
-      <label>
-        sts/10cm{" "}
-        <input
-          type="number"
-          value={gauge?.stitchGauge ?? ""}
-          onChange={(event) => updateGauge("stitch", event.target.value)}
-        />
-      </label>
-      <label>
-        rows/10cm{" "}
-        <input
-          type="number"
-          value={gauge?.rowGauge ?? ""}
-          onChange={(event) => updateGauge("row", event.target.value)}
-        />
-      </label>
-      <input type="color" onChange={addColour} />
+      <GaugeInput
+        label="sts/10cm"
+        value={gauge?.stitchGauge ?? ""}
+        onChange={(value) => updateGauge("stitch", value)}
+      />
+      <GaugeInput
+        label="rows/10cm"
+        value={gauge?.rowGauge ?? ""}
+        onChange={(value) => updateGauge("row", value)}
+      />
+      <ColourPicker onChange={addColour} />
       {colours.map((colour) => (
         <Colour
           key={colour}
@@ -79,29 +82,23 @@ export function Controls() {
           removeColour={() => removeColour(colour)}
         />
       ))}
-      <label>
-        draw line
-        <input
-          type="checkbox"
-          checked={drawingMode === "line"}
-          onChange={() =>
-            setDrawingMode(drawingMode === "line" ? "stitch" : "line")
-          }
-        />
-      </label>
-      <label>
-        clear line
-        <input
-          type="checkbox"
-          checked={drawingMode === "delete-line"}
-          onChange={() =>
-            setDrawingMode(
-              drawingMode === "delete-line" ? "stitch" : "delete-line"
-            )
-          }
-        />
-      </label>
-      <button onClick={clearChart}>clear chart</button>
+      <LineControl
+        mode="draw"
+        isChecked={drawingMode === "line"}
+        onChange={() =>
+          setDrawingMode(drawingMode === "line" ? "stitch" : "line")
+        }
+      />
+      <LineControl
+        mode="clear"
+        isChecked={drawingMode === "delete-line"}
+        onChange={() =>
+          setDrawingMode(
+            drawingMode === "delete-line" ? "stitch" : "delete-line"
+          )
+        }
+      />
+      <ClearChart onClick={clearChart} />
     </fieldset>
   )
 }
