@@ -1,4 +1,4 @@
-import { ChangeEvent, useRef, useState } from "react"
+import React, { ChangeEvent, useRef, useState } from "react"
 
 type Props = {
   onChange: (event: ChangeEvent<HTMLInputElement>) => void
@@ -19,13 +19,13 @@ export function ColourPicker({ onChange }: Props) {
         borderRadius: "5px",
         overflow: "hidden",
         border: "1px solid",
+        position: "relative",
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       <svg viewBox="0 0 90 90" width="30px">
         {squares.current?.map((_, index) => {
-          console.log(index % 3)
           return (
             <rect
               key={index}
@@ -48,12 +48,8 @@ export function ColourPicker({ onChange }: Props) {
         type="color"
         onChange={onChange}
         style={{
-          position: "fixed",
-          top: "-100%",
-          width: "0",
-          height: "0",
-          overflow: "hidden",
-          visibility: "hidden",
+          position: "absolute",
+          zIndex: -1,
         }}
       />
     </label>

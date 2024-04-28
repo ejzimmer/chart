@@ -1,4 +1,4 @@
-import { ChangeEvent, useCallback, useState } from "react"
+import React, { ChangeEvent, useCallback, useState } from "react"
 import { Colour } from "./Colour"
 import { getColours, persistColours } from "../storage-utils"
 import { useData, useUpdaters } from "../Context"
@@ -75,11 +75,11 @@ export function Controls() {
         onChange={(value) => updateGauge("row", value)}
       />
       <ColourPicker onChange={addColour} />
-      {colours.map((colour) => (
+      {colours.map((colour, index) => (
         <Colour
           key={colour}
           colour={colour}
-          isSelected={colour === currentColour}
+          isSelected={currentColour ? colour === currentColour : index === 0}
           selectColour={() => setCurrentColour(colour)}
           removeColour={() => removeColour(colour)}
         />
