@@ -28,11 +28,13 @@ export function Controls() {
   const [colours, setColours] = useState<string[]>(initialiseColours)
   const addColour = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      const newColours = Array.from(new Set([...colours, event.target.value]))
+      const colour = event.target.value
+      const newColours = Array.from(new Set([...colours, colour]))
       setColours(newColours)
       persistColours(newColours)
+      setCurrentColour(colour)
     },
-    [colours]
+    [colours, setCurrentColour]
   )
   const removeColour = useCallback(
     (colour: string) => {
