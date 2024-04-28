@@ -19,13 +19,12 @@ export function Grid() {
 
   return (
     <div ref={gridRef}>
+      <Stitches />
       {gridHasRendered && (
         <Lines
           convertGridReferencesToCoordinates={getAbsoluteCoordinates(gridRef)}
         />
       )}
-
-      <Stitches />
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import { useData } from "../../Context"
+import { useData, useUpdaters } from "../../Context"
 import { Line } from "./Line"
 import { Lines as LinesType } from "../../types"
 import { useMemo } from "react"
@@ -11,7 +11,8 @@ type Props = {
 }
 
 export function Lines({ convertGridReferencesToCoordinates }: Props) {
-  const { dimensions, lines } = useData()
+  const { dimensions, lines, drawingMode } = useData()
+  const { clearLine } = useUpdaters()
 
   const coordinates = useMemo(
     () => (lines ? convertGridReferencesToCoordinates(lines) : []),
@@ -29,11 +30,15 @@ export function Lines({ convertGridReferencesToCoordinates }: Props) {
         left: 0,
         width: "100vw",
         height: "100vh",
-        zIndex: -1,
+        pointerEvents: drawingMode === "delete-line" ? "auto" : "none",
       }}
     >
       {coordinates.map((vertices, index) => (
-        <Line key={index} vertices={vertices} />
+        <Line
+          key={index}
+          vertices={vertices}
+          onClick={() => clearLine(index)}
+        />
       ))}
     </svg>
   )

@@ -57,6 +57,7 @@ export const UpdaterContext = createContext<Updaters>({
   updateCurrentLine: () => undefined,
   clearChart: () => undefined,
   drawStitch: () => undefined,
+  clearLine: () => undefined,
 })
 
 export function useData() {
@@ -174,6 +175,18 @@ export function Provider({ children }: PropsWithChildren<unknown>) {
     [lines]
   )
 
+  const clearLine = useCallback(
+    (lineIndex: number) => {
+      const updatedLines = [
+        ...lines.slice(0, lineIndex),
+        ...lines.slice(lineIndex + 1),
+      ]
+      setLines(updatedLines)
+      persistLines(updatedLines)
+    },
+    [lines]
+  )
+
   return (
     <UpdaterContext.Provider
       value={{
@@ -183,6 +196,7 @@ export function Provider({ children }: PropsWithChildren<unknown>) {
         drawStitch,
         updateCurrentLine,
         clearChart,
+        clearLine,
       }}
     >
       <DataContext.Provider

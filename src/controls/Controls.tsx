@@ -44,7 +44,15 @@ export function Controls() {
   )
 
   return (
-    <fieldset>
+    <fieldset
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100%",
+        background: "white",
+      }}
+    >
       <label>
         sts/10cm{" "}
         <input

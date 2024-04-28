@@ -36,4 +36,5 @@ export type Updaters = {
   updateCurrentLine: (corner: GridPosition) => void
   drawStitch: (stitch: GridPosition) => void
   clearChart: () => void
+  clearLine: (lineIndex: number) => void
 }

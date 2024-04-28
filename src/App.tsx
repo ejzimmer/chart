@@ -2,7 +2,6 @@ import { Controls } from "./controls/Controls"
 import { Grid } from "./grid/Grid"
 import { Provider } from "./Context"
 
-// delete lines
 // make pretty, a11y, error handling
 // publish
 // when adding a new colour, automatically select it
@@ -11,8 +10,8 @@ import { Provider } from "./Context"
 function App() {
   return (
     <Provider>
-      <Controls />
       <Grid />
+      <Controls />
     </Provider>
   )
 }
