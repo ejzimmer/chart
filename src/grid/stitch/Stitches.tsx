@@ -4,7 +4,7 @@ import { Stitch } from "./Stitch"
 
 export function Stitches() {
   const { dimensions, pattern, drawingMode } = useData()
-  const { drawStitch, updateCurrentLine } = useUpdaters()
+  const { updateCurrentLine, startFill, endFill, fillStitch } = useUpdaters()
 
   if (!dimensions || !pattern) return null
 
@@ -28,9 +28,19 @@ export function Stitches() {
             >
               <Stitch
                 colour={stitch}
-                onClick={() => drawStitch({ y: rowIndex, x: columnIndex })}
-              />
-              {drawingMode !== "stitch" && (
+                onMouseDown={() => {
+                  startFill({ x: columnIndex, y: rowIndex })
+                }}
+                onMouseEnter={() => fillStitch({ x: columnIndex, y: rowIndex })}
+                onMouseUp={() => endFill()}
+              >
+                {columnIndex === 0
+                  ? rowIndex
+                  : rowIndex === row.length - 1
+                  ? columnIndex
+                  : ""}
+              </Stitch>
+              {drawingMode.includes("line") && (
                 <Corner
                   onClick={() =>
                     updateCurrentLine({ y: rowIndex, x: columnIndex })

@@ -15,7 +15,7 @@ export type Dimensions = {
 export type StitchGrid = (string | undefined)[][]
 export type GridPosition = { x: number; y: number }
 export type Lines = GridPosition[][]
-export type DrawingMode = "stitch" | "line" | "delete-line"
+export type DrawingMode = "stitch" | "line" | "delete-line" | "fill"
 
 type StoredData = {
   gauge: Gauge
@@ -34,7 +34,9 @@ export type Updaters = {
   setCurrentColour: (colour: string) => void
   setDrawingMode: (mode: DrawingMode) => void
   updateCurrentLine: (corner: GridPosition) => void
-  drawStitch: (stitch: GridPosition) => void
   clearChart: () => void
   clearLine: (lineIndex: number) => void
+  startFill: (stitch: GridPosition) => void
+  endFill: () => void
+  fillStitch: (sttich: GridPosition) => void
 }

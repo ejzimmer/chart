@@ -1,9 +1,19 @@
+import { PropsWithChildren } from "react"
+
 type Props = {
   colour?: string
-  onClick: () => void
+  onMouseDown: () => void
+  onMouseEnter: () => void
+  onMouseUp: () => void
 }
 
-export function Stitch({ colour, onClick }: Props) {
+export function Stitch({
+  colour,
+  onMouseDown,
+  onMouseEnter,
+  onMouseUp,
+  children,
+}: PropsWithChildren<Props>) {
   return (
     <div
       style={{
@@ -12,8 +22,15 @@ export function Stitch({ colour, onClick }: Props) {
         backgroundColor: colour ?? "transparent",
         cursor: "pointer",
         height: "100%",
+        fontFamily: "sans-serif",
+        color: "hsl(0 0% 40%)",
+        fontSize: "80%",
       }}
-      onClick={onClick}
-    />
+      onMouseDown={onMouseDown}
+      onMouseEnter={onMouseEnter}
+      onMouseUp={onMouseUp}
+    >
+      {children}
+    </div>
   )
 }

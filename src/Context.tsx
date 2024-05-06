@@ -56,8 +56,10 @@ export const UpdaterContext = createContext<Updaters>({
   setDrawingMode: () => undefined,
   updateCurrentLine: () => undefined,
   clearChart: () => undefined,
-  drawStitch: () => undefined,
   clearLine: () => undefined,
+  startFill: () => undefined,
+  endFill: () => undefined,
+  fillStitch: () => undefined,
 })
 
 export function useData() {
@@ -99,9 +101,9 @@ export function Provider({ children }: PropsWithChildren<unknown>) {
     persistCurrentColour(colour)
   }, [])
 
-  const drawStitch = useCallback(
-    ({ y: row, x: column }: GridPosition) => {
-      if (drawingMode !== "stitch" || !pattern) return
+  const colourStitch = useCallback(
+    ({ x: column, y: row }: GridPosition) => {
+      if (!pattern) return
 
       const currentStitchColour = pattern[row][column]
       const newStitchColour = currentStitchColour ? undefined : currentColour
@@ -118,8 +120,27 @@ export function Provider({ children }: PropsWithChildren<unknown>) {
       setPattern(newPattern)
       persistPattern(newPattern)
     },
-    [pattern, currentColour, drawingMode]
+    [pattern, currentColour]
   )
+
+  const startFill = useCallback(
+    (pos: GridPosition) => {
+      if (drawingMode !== "stitch") return
+
+      setDrawingMode("fill")
+      colourStitch(pos)
+    },
+    [drawingMode, setDrawingMode, colourStitch]
+  )
+  const fillStitch = useCallback(
+    (pos: GridPosition) => {
+      if (drawingMode === "fill") colourStitch(pos)
+    },
+    [drawingMode, colourStitch]
+  )
+  const endFill = useCallback(() => {
+    setDrawingMode("stitch")
+  }, [setDrawingMode])
 
   const clearChart = useCallback(() => {
     if (!pattern) return
@@ -193,10 +214,12 @@ export function Provider({ children }: PropsWithChildren<unknown>) {
         setGauge: updateGauge,
         setCurrentColour: updateCurrentColour,
         setDrawingMode: changeDrawingMode,
-        drawStitch,
         updateCurrentLine,
         clearChart,
         clearLine,
+        startFill,
+        endFill,
+        fillStitch,
       }}
     >
       <DataContext.Provider
